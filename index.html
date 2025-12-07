@@ -1,0 +1,286 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Productivity App</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+      tailwind.config = {
+        darkMode: 'class',
+      };
+    </script>
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css"
+    />
+    <style>
+      .scrollbar-custom::-webkit-scrollbar {
+        width: 6px;
+      }
+
+      .scrollbar-custom::-webkit-scrollbar-track {
+        background: #e0e7ff;
+        border-radius: 10px;
+      }
+
+      .scrollbar-custom::-webkit-scrollbar-thumb {
+        background: #818cf8;
+        border-radius: 10px;
+      }
+
+      .dark .scrollbar-custom::-webkit-scrollbar-track {
+        background: #1e293b;
+      }
+
+      .dark .scrollbar-custom::-webkit-scrollbar-thumb {
+        background: #6366f1;
+      }
+    </style>
+  </head>
+  <body class="h-screen overflow-hidden bg-blue-50 dark:bg-gray-900">
+    <!-- Main Container -->
+    <div class="h-screen flex flex-col p-4 md:p-6 gap-4">
+      <!-- Header section with title and controls -->
+      <header class="flex-shrink-0">
+        <div class="flex items-center justify-between">
+          <div>
+            <h1
+              class="text-2xl md:text-4xl font-bold text-indigo-600 dark:text-indigo-400 mb-1"
+            >
+              Productivity App
+            </h1>
+          </div>
+          <!-- Statistics dashboard -->
+          <section
+            class="flex-1 bg-white dark:bg-slate-800 border border-blue-200 dark:border-indigo-700 shadow-lg rounded-2xl p-4 flex-shrink-0 mx-32"
+          >
+            <div class="grid grid-cols-3 gap-4 text-center">
+              <!-- Total tasks counter -->
+              <div class="flex items-center justify-center gap-2">
+                <p class="text-indigo-700 dark:text-indigo-400">Total Tasks</p>
+                <p
+                  id="totalTasksCount"
+                  class="text-xl font-bold text-indigo-600 dark:text-indigo-400"
+                >
+                  0
+                </p>
+              </div>
+              <!-- Completed tasks counter -->
+              <div class="flex items-center justify-center gap-2">
+                <p class="text-indigo-700 dark:text-indigo-400">Completed</p>
+                <p
+                  id="completedTasksCount"
+                  class="text-xl font-bold text-indigo-600 dark:text-indigo-400"
+                >
+                  0
+                </p>
+              </div>
+              <!-- Total notes counter -->
+              <div class="flex items-center justify-center gap-2">
+                <p class="text-indigo-700 dark:text-indigo-400">Notes</p>
+                <p
+                  id="totalNotesCount"
+                  class="text-xl font-bold text-indigo-600 dark:text-indigo-400"
+                >
+                  0
+                </p>
+              </div>
+            </div>
+          </section>
+          <!-- Theme toggle buttons -->
+          <div class="flex gap-2">
+            <button
+              id="lightModeBtn"
+              class="bg-white dark:bg-slate-800 border border-blue-200 dark:border-indigo-700 px-4 py-2 rounded-xl text-indigo-700 dark:text-indigo-300 font-medium text-sm md:text-base hidden dark:flex items-center gap-1"
+            >
+              <i class="bi bi-sun-fill text-yellow-500 mr-1"></i>
+              <span>Light</span>
+            </button>
+            <button
+              id="darkModeBtn"
+              class="bg-white dark:bg-slate-800 border border-blue-200 dark:border-indigo-700 px-4 py-2 rounded-xl text-indigo-700 dark:text-indigo-300 font-medium text-sm md:text-base flex dark:hidden items-center gap-1"
+            >
+              <i
+                class="bi bi-moon-stars-fill text-indigo-600 dark:text-slate-300 mr-1"
+              ></i>
+              <span>Dark</span>
+            </button>
+          </div>
+        </div>
+      </header>
+
+      <!-- Main content grid: Tasks and Notes -->
+      <div class="flex-1 grid grid-cols-1 md:grid-cols-2 gap-4 min-h-0">
+        <!-- Left panel: Task Management -->
+        <div
+          class="bg-white dark:bg-slate-800 border border-blue-200 dark:border-indigo-700 shadow-lg rounded-2xl p-4 md:p-6 flex flex-col min-h-0"
+        >
+          <div class="flex items-center justify-between mb-4">
+            <h2
+              class="text-xl md:text-2xl font-bold text-indigo-900 dark:text-indigo-100"
+            >
+              <i class="bi bi-card-checklist"></i>
+              <span>Tasks</span>
+            </h2>
+            <!-- Active tasks counter badge -->
+            <span
+              class="bg-blue-100 dark:bg-indigo-900 border border-blue-300 dark:border-indigo-700 px-3 py-1 rounded-full text-indigo-800 dark:text-indigo-300 text-sm font-semibold"
+              ><span id="activeTasksCount">0</span> active</span
+            >
+          </div>
+
+          <!-- Add task input form -->
+          <form id="taskForm" class="mb-4 relative">
+            <div class="flex gap-2">
+              <input
+                id="taskInput"
+                type="text"
+                placeholder="Add a new task..."
+                class="flex-1 bg-white dark:bg-slate-900 border border-blue-300 dark:border-indigo-700 rounded-xl px-4 py-3 text-gray-800 dark:text-indigo-100 placeholder-indigo-400 dark:placeholder-indigo-600"
+              />
+              <button
+                type="submit"
+                id="addTaskBtn"
+                class="bg-indigo-600 dark:bg-indigo-600 shadow-md px-6 py-3 rounded-xl text-white font-semibold"
+              >
+                Add
+              </button>
+            </div>
+            <p
+              class="absolute top-10 bg-white px-1 text-sm text-red-600 ml-4 hidden font-semibold"
+              id="errorTask"
+            >
+              Fill text to continue
+            </p>
+          </form>
+
+          <!-- Scrollable task list -->
+          <div
+            id="taskList"
+            class="flex-1 overflow-y-auto scrollbar-custom space-y-2 min-h-0"
+          >
+            <!-- Tasks rendered dynamically -->
+          </div>
+        </div>
+
+        <!-- Right panel: Notes Section -->
+        <div
+          class="bg-white dark:bg-slate-800 border border-blue-200 dark:border-indigo-700 shadow-lg rounded-2xl p-4 md:p-6 flex flex-col min-h-0"
+        >
+          <div class="flex items-center justify-between mb-4">
+            <h2
+              class="text-xl md:text-2xl font-bold text-indigo-900 dark:text-indigo-100"
+            >
+              <i class="bi bi-journal-text"></i>
+              <span>Take Notes</span>
+            </h2>
+            <!-- Create new note button -->
+            <button
+              id="newNoteBtn"
+              class="bg-indigo-600 dark:bg-indigo-600 shadow-md px-4 py-2 rounded-xl text-white font-semibold text-sm"
+            >
+              <i class="bi bi-file-earmark-plus mr-1"></i> New Note
+            </button>
+          </div>
+
+          <!-- Scrollable notes grid -->
+          <div
+            id="notesList"
+            class="flex-1 overflow-y-auto scrollbar-custom space-y-3 min-h-0 content-start"
+          >
+            <!-- Notes rendered dynamically -->
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Modal overlay for creating new note -->
+    <div
+      id="noteModal"
+      class="fixed inset-0 bg-black/50 items-center flex justify-center hidden z-50 p-4"
+    >
+      <div
+        class="bg-white dark:bg-slate-800 border border-blue-200 dark:border-indigo-700 shadow-2xl rounded-2xl p-6 w-full max-w-md"
+      >
+        <div class="flex items-center justify-between mb-4">
+          <h3 class="text-xl font-bold text-indigo-900 dark:text-indigo-100">
+            Create New Note
+          </h3>
+          <!-- Close modal button -->
+          <button
+            id="closeModal"
+            class="text-indigo-700 dark:text-indigo-300 text-2xl font-bold"
+          >
+            <i class="bi bi-x-lg"></i>
+          </button>
+        </div>
+
+        <!-- Note creation form -->
+        <form id="noteForm">
+          <!-- Note title input -->
+          <div class="mb-4 relative">
+            <label
+              class="block text-indigo-800 dark:text-indigo-300 text-sm font-semibold mb-2"
+              >Title*</label
+            >
+            <input
+              type="text"
+              id="noteTitle"
+              placeholder="Enter note title..."
+              class="w-full bg-white dark:bg-slate-900 border border-blue-300 dark:border-indigo-700 rounded-xl px-4 py-3 text-gray-800 dark:text-indigo-100 placeholder-indigo-400 dark:placeholder-indigo-600"
+            />
+            <p
+              class="absolute top-[4.2rem] bg-white hidden px-1 text-sm text-red-600 ml-4 font-semibold"
+              id="errorTitle"
+            >
+              Add title to continue
+            </p>
+          </div>
+
+          <!-- Note content textarea -->
+          <div class="mb-6 relative">
+            <label
+              class="block text-indigo-800 dark:text-indigo-300 text-sm font-semibold mb-2"
+              >Content*</label
+            >
+            <textarea
+              id="noteContent"
+              placeholder="Enter your note..."
+              rows="6"
+              class="w-full bg-white dark:bg-slate-900 border border-blue-300 dark:border-indigo-700 rounded-xl px-4 py-3 text-gray-800 dark:text-indigo-100 placeholder-indigo-400 dark:placeholder-indigo-600 resize-none"
+            ></textarea>
+            <p
+              class="absolute top-[11.8rem] bg-white px-1 hidden text-sm text-red-600 ml-4 font-semibold"
+              id="errorContent"
+            >
+              Add content to continue
+            </p>
+          </div>
+
+          <!-- Form action buttons -->
+          <div class="flex gap-3">
+            <!-- Cancel button -->
+            <button
+              type="button"
+              id="closeModal"
+              class="flex-1 bg-white dark:bg-slate-700 border border-blue-300 dark:border-indigo-700 px-4 py-3 rounded-xl text-indigo-800 dark:text-indigo-300 font-semibold"
+            >
+              Cancel
+            </button>
+            <!-- Save button -->
+            <button
+              id="saveNoteBtn"
+              type="submit"
+              class="flex-1 bg-indigo-600 dark:bg-indigo-600 shadow-md px-4 py-3 rounded-xl text-white font-semibold"
+            >
+              Save Note
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <script src="script.js"></script>
+  </body>
+</html>
