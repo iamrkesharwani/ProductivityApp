@@ -19,7 +19,7 @@ const newNoteBtn = document.getElementById('newNoteBtn');
 const notesList = document.getElementById('notesList');
 const noteModal = document.getElementById('noteModal');
 const saveNoteBtn = document.getElementById('saveNoteBtn');
-const closeModal = document.querySelectorAll('#closeModal');
+const closeModal = document.querySelectorAll('.closeModal');
 const noteForm = document.getElementById('noteForm');
 const noteTitle = document.getElementById('noteTitle');
 const noteContent = document.getElementById('noteContent');
@@ -71,10 +71,21 @@ lightModeBtn.addEventListener('click', () => applyTheme('light'));
 taskForm.addEventListener('submit', (e) => {
   e.preventDefault();
 
+  const value = taskInput.value.trim();
+
+  if (!value) {
+    errorTask.classList.remove('hidden');
+    return;
+  } else {
+    errorTask.classList.add('hidden');
+  }
+
   const newTask = {
     id: isTaskEditing ? editingTaskId : Date.now(),
-    taskName: taskInput.value.trim(),
-    completed: false,
+    taskName: value,
+    completed: isTaskEditing
+      ? taskContainer.find((t) => t.id === editingTaskId)?.completed ?? false
+      : false,
   };
 
   if (isTaskEditing) {
@@ -207,6 +218,24 @@ noteForm.addEventListener('submit', (e) => {
   const title = noteTitle.value.trim();
   const content = noteContent.value.trim();
 
+  let hasError = false;
+
+  if (!title) {
+    errorTitle.classList.remove('hidden');
+    hasError = true;
+  } else {
+    errorTitle.classList.add('hidden');
+  }
+
+  if (!content) {
+    errorContent.classList.remove('hidden');
+    hasError = true;
+  } else {
+    errorContent.classList.add('hidden');
+  }
+
+  if (hasError) return;
+
   if (isNoteEditing) {
     notesContainer = notesContainer.map((note) =>
       note.id === editingNoteId ? { ...note, title, content } : note
@@ -215,11 +244,7 @@ noteForm.addEventListener('submit', (e) => {
     editingNoteId = null;
     saveNoteBtn.textContent = 'Save Note';
   } else {
-    const newNote = {
-      id: Date.now(),
-      title,
-      content,
-    };
+    const newNote = { id: Date.now(), title, content };
     notesContainer.unshift(newNote);
   }
 
@@ -246,12 +271,23 @@ notesList.addEventListener('click', (e) => {
 });
 
 // Events: Modal Visibility
+function resetNoteState() {
+  isNoteEditing = false;
+  editingNoteId = null;
+  saveNoteBtn.textContent = 'Save Note';
+  noteForm.reset();
+  errorTitle.classList.add('hidden');
+  errorContent.classList.add('hidden');
+}
+
 newNoteBtn.addEventListener('click', () => {
+  resetNoteState();
   noteModal.classList.remove('hidden');
 });
 
 closeModal.forEach((button) => {
   button.addEventListener('click', () => {
+    resetNoteState();
     noteModal.classList.add('hidden');
   });
 });
