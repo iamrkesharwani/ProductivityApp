@@ -179,7 +179,7 @@ function renderTasks(list = taskContainer) {
   }
 
   list.forEach((item) => createNewTask(item));
-  udpateUI();
+  updateUI();
 }
 
 // Logic: CRUD Operations for Tasks
@@ -336,7 +336,7 @@ function renderNotes(list = notesContainer) {
   }
 
   list.forEach((note) => createNewNote(note));
-  udpateUI();
+  updateUI();
 }
 
 // Logic: CRUD Operations for Notes
@@ -382,7 +382,7 @@ function setNotes(notes) {
 }
 
 // UI: Update Stats Counters
-function udpateUI() {
+function updateUI() {
   const totalTasks = taskContainer.length;
   const completedTasks = taskContainer.filter((task) => task.completed).length;
   const activeTasks = totalTasks - completedTasks;
